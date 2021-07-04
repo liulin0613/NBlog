@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cyslin.blog.mapper.ArticleMapper">
+
+    <insert id="addArticle">
+        insert into article (a_title,a_tags,a_scope,a_content,a_time,a_author)
+        values (#{title},#{tags},#{scope},#{content},#{time},#{author})
+    </insert>
+    <insert id="addfavorites">
+        insert into favorites (u_id,a_id,f_time) values (#{uid},#{aid},#{time})
+    </insert>
+    <insert id="addDraft">
+        insert into draft (d_title,d_tags,d_scope,d_content,d_time,d_author)
+        values (#{title},#{tags},#{scope},#{content},#{time},#{author})
+    </insert>
+    <update id="deleteArticle">
+        update article set a_state=0 where a_id=#{aid}
+    </update>
+    <delete id="deletefavorites">
+        delete from favorites where u_id=#{uid} and a_id=#{aid}
+    </delete>
+    <delete id="deleteDraft">
+        update draft set d_state=0 where d_id=#{did}
+    </delete>
+    <select id="getArticleData" resultType="com.cyslin.blog.bean.Article">
+        select a_id,a_title,a_tags,a_scope,LEFT(a_content,200) as a_content,a_time,a_author
+        from article where a_state=1 and a_scope='公开'
+        ORDER BY a_id desc limit #{page},#{limit}
+    </select>
+    <select id="getDetailsById" resultType="com.cyslin.blog.bean.Article">
+        select a_title,a_tags,a_content,a_time,a_author
+        from article where a_id=#{id}
+
+    </select>
+    <select id="getHotTags" resultType="java.lang.String">
+        SELECT a_tags FROM article where a_state=1  and a_scope='公开'
+    </select>
+    <select id="getArticleLen" resultType="java.lang.Integer">
+        select count(*) from article where a_state='1' and a_scope='公开'
+    </select>
+    <select id="getAllTitles" resultType="com.cyslin.blog.bean.Article">
+        select a_id,a_title from article where a_state='1' and a_scope='公开' ORDER BY a_id desc
+    </select>
+    <select id="getIdByname" resultType="java.lang.Integer">
+        select u_id from user where u_name=#{name}
+    </select>
+    <select id="getPublished" resultType="com.cyslin.blog.bean.Article">
+        select a_id,a_title,LEFT(a_content,100) as a_content,a_time from article
+        where a_state=1 and a_author=#{name} ORDER BY a_id desc
+
+    </select>
+    <select id="getArticleInfo" resultType="com.cyslin.blog.bean.Article">
+        select a_title,a_content,a_tags,a_scope from article where a_id=#{aid}
+    </select>
+    <select id="getEchartsDataByMonth" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM article where a_author=#{name} and (a_time like CONCAT(#{month},'%')) and a_state=1
+    </select>
+    <select id="getEchartsDataByYear" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM article where a_author=#{name} and (a_time like CONCAT(#{year},'%')) and a_state=1
+    </select>
+    <select id="getTagArticleData" resultType="com.cyslin.blog.bean.Article">
+        select a_id,a_title,a_tags,a_scope,LEFT(a_content,200) as a_content,a_time,a_author
+        from article where a_state=1 and a_scope='公开'
+        and a_tags LIKE CONCAT('%',#{tagname},'%') ORDER BY a_id desc
+    </select>
+    <select id="hasfavorites" resultType="java.lang.Integer">
+        select count(*) from favorites where u_id=#{uid} and a_id=#{aid}
+    </select>
+    <select id="getAllfavorites" resultType="com.cyslin.blog.bean.Article">
+        select a.a_id,a_title,f.f_time as a_time
+        from article a, favorites f where f.a_id=a.a_id and f.u_id=#{uid} ORDER BY a_id desc
+    </select>
+    <select id="getAllDraft" resultType="com.cyslin.blog.bean.Article">
+        select d_id a_id,d_title a_title,d_time a_time from draft
+        where d_state=1 and d_author=#{name} ORDER BY d_id desc
+    </select>
+    <select id="getDraftInfo" resultType="com.cyslin.blog.bean.Article">
+        select d_title a_title,d_content a_content,d_tags a_tags,d_scope a_scope from draft where d_id=#{did}
+    </select>
+</mapper>

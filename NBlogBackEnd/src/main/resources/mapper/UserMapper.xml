@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cyslin.blog.mapper.UserMapper">
+    <insert id="addUser">
+        insert into user (u_name,u_pwd,u_email,u_time) values (#{name},#{pwd},#{email},#{time});
+    </insert>
+    <insert id="addfollow">
+        insert into follow(u_id,f_id) values (#{uid},#{fid})
+    </insert>
+    <insert id="addAlertHistory">
+        insert into alertname (al_old,al_new,al_time) values (#{oldname},#{name},#{time});
+    </insert>
+    <update id="alertUserName">
+        update user set u_name=#{name} where u_name=#{oldname}
+    </update>
+    <update id="alertArticleName">
+        update article set a_author=#{name} where a_author=#{oldname}
+    </update>
+    <update id="alertDraftName">
+        update draft set d_author=#{name} where d_author=#{oldname}
+    </update>
+    <update id="alertPwd">
+        update user set u_pwd=#{pwd} where u_name=#{name}
+    </update>
+    <delete id="deletefollow">
+        delete from follow where u_id=#{uid} and f_id=#{fid}
+    </delete>
+
+    <select id="Checkname" resultType="java.lang.Integer">
+        select count(*) from user where u_name=#{name}
+    </select>
+    <select id="getPwdByName" resultType="java.lang.String">
+        select u_pwd from user where u_name=#{name} and u_state=1
+    </select>
+    <select id="Checkemail" resultType="java.lang.Integer">
+        select count(*) from user where u_email=#{email} and u_state=1
+    </select>
+    <select id="getNameByEmail" resultType="java.lang.String">
+        select u_name from user where u_email=#{email}
+    </select>
+    <select id="getuIdByName" resultType="java.lang.Integer">
+        select u_id from user where u_name=#{name}
+    </select>
+    <select id="hasfollow" resultType="java.lang.Integer">
+        select count(*) from follow where u_id=#{uid} and f_id=#{fid}
+    </select>
+    <select id="getAllfollows" resultType="java.lang.Integer">
+        select f_id from follow where u_id=#{uid}
+    </select>
+    <select id="getNameByID" resultType="java.lang.String">
+        select u_name from user where u_id=#{follow}
+    </select>
+    <select id="getTimeByID" resultType="java.lang.String">
+        select u_time from user where u_id=#{follow}
+    </select>
+    <select id="getfollowcount" resultType="java.lang.Integer">
+        select count(*) from follow where u_id=#{follow}
+    </select>
+    <select id="getfanscount" resultType="java.lang.Integer">
+        select count(*) from follow where f_id=#{follow}
+    </select>
+    <select id="getarticlecount" resultType="java.lang.Integer">
+        select count(*) from article where a_author=#{aname} and a_state='1' and a_scope!='私密'
+    </select>
+    <select id="getPublishedByName" resultType="com.cyslin.blog.bean.Article">
+        select a_id,a_title,a_time
+        from article  where a_author=#{name} and a_state='1' and a_scope!='私密' ORDER BY a_id desc
+    </select>
+    <select id="getEmailbyName" resultType="java.lang.String">
+        select u_email from user where u_name=#{name}
+    </select>
+    <select id="hasCard" resultType="java.lang.Integer">
+        select count(*) from alertname where al_new=#{name}
+    </select>
+    <select id="getAlertTime" resultType="java.lang.String">
+         select al_time from alertname where al_new=#{name}
+    </select>
+</mapper>
