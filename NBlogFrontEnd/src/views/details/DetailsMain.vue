@@ -122,5 +122,9 @@
 </script>
 
 <style scoped>
-
+  @media screen and (max-width: 900px) {
+    .el-aside {
+      display: none;
+    }
+  }
 </style>

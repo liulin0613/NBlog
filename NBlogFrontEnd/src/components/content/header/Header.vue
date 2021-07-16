@@ -10,7 +10,7 @@
         <div>Simplicity &nbsp; is &nbsp; beauty</div>
       </div></el-col>
 
-      <el-col :span="2"><div class="grid-content">
+      <el-col :span="2"><div class="grid-content show">
         <el-menu class="el-menu-demo" mode="horizontal">
           <el-submenu index="1">
 
@@ -72,6 +72,19 @@
     color: darkorange;
     overflow: hidden;
     font-style:oblique
+  }
+
+  @media screen and (max-width: 900px) {
+    .center {
+      display: none;
+    }
+
+    .show{
+      display: none;
+    }
+    .row-bg{
+      width: 100%;
+    }
   }
 
 </style>

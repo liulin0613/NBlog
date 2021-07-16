@@ -38,4 +38,10 @@
   #app{
     padding-left: 20px;
   }
+
+  @media screen and (max-width: 900px) {
+    #app{
+      padding-left: 0;
+    }
+  }
 </style>

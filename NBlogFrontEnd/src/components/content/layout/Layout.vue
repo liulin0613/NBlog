@@ -25,4 +25,10 @@
     padding-left:0;
   }
 
+  @media screen and (max-width: 900px) {
+    .el-aside {
+      display: none;
+    }
+  }
+
 </style>

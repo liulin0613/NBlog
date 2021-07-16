@@ -249,6 +249,12 @@
 </script>
 
 <style scoped>
+  @media screen and (max-width: 900px) {
+    .el-col-8 {
+      width: 90%;
+    }
+  }
+
   .row-bg{
     display: flex;
     align-items:center;

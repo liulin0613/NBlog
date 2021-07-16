@@ -155,7 +155,7 @@
           })
           .catch(err => console.log(err))
 
-      },100)
+      },300)
 
       setTimeout(()=>{
         document.getElementById('contents').style.display='block'

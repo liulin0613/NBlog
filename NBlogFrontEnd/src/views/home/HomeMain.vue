@@ -25,7 +25,7 @@
             :hide-on-single-page="value"
             :current-page="parseInt(this.$store.state.page)+1"
             :page-size="10"
-            layout="total, prev, pager, next, jumper"
+            layout="total, prev, pager, next"
             :total="lens">
           </el-pagination>
         </div>
@@ -172,6 +172,15 @@
     top:20px;
     padding: 6px 6px;
     margin-left: 10px;
+  }
+
+  @media screen and (max-width: 900px) {
+    .el-aside {
+      display: none;
+    }
+    .el-pagination__jump{
+      display: none;
+    }
   }
 
 </style>

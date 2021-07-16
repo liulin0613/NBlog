@@ -9,19 +9,21 @@
             <mavon-editor
               class="md description"
               :value="description"
-              :subfield="false"
               :defaultOpen="'preview'"
               :toolbarsFlag="false"
               :editable="false"
               :scrollStyle="false"
+              :subfield = "subfield"
               :ishljs="true"
+              :codeStyle="code_style"
+              :externalLink="externalLink"
             />
         </el-row>
 
         <el-row class="font">
           <el-col :span="4"><span class="el-icon-time">&nbsp;<slot name="time"></slot></span></el-col>
-          <el-col :span="4"><span class="el-icon-user">&nbsp;author : <slot name="author"></slot></span></el-col>
-          <el-col :span="12" v-if="tags[0]!==''">
+          <el-col :span="6"><span class="el-icon-user">&nbsp;author : <slot name="author"></slot></span></el-col>
+          <el-col :span="10" v-if="tags[0]!==''">
             <div class="tags">
               <el-tag
                 v-for="(item,i) in tags"
@@ -44,7 +46,35 @@
     name: "Article",
     data(){
       return {
-        type:['','success','info','danger','warning']
+        type:['','success','info','danger','warning'],
+        subfield: false,
+        code_style: 'idea',
+        externalLink: {
+          markdown_css: function() {
+            // 这是你的markdown css文件路径
+            return './markdown/github-markdown.min.css';
+          },
+          hljs_js: function() {
+            // 这是你的hljs文件路径
+            return './highlightjs/highlight.min.js';
+          },
+          hljs_css: function(css) {
+            // 这是你的代码高亮配色文件路径
+            return './highlightjs/styles/' + css + '.min.css';
+          },
+          hljs_lang: function(lang) {
+            // 这是你的代码高亮语言解析路径
+            return './highlightjs/languages/' + lang + '.min.js';
+          },
+          katex_css: function() {
+            // 这是你的katex配色方案路径路径
+            return './katex/katex.min.css';
+          },
+          katex_js: function() {
+            // 这是你的katex.js路径
+            return './katex/katex.min.js';
+          },
+        }
       }
     },
     props:{
@@ -91,4 +121,21 @@
     font-size: 1.03rem;
   }
 
+  @media screen and (max-width: 900px) {
+    h1{
+      line-height: 30px;
+      padding-bottom: 10px;
+    }
+
+    .tags{
+      display: none;
+    }
+    .el-col-4{
+      width: 50%;
+    }
+    .el-col-6{
+      width: 50%;
+    }
+
+  }
 </style>
