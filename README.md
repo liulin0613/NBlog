@@ -2,7 +2,7 @@
 SpringBoot + vue + Element-UI 搭建的个人博客系统
 
 ## 网站访问连接：
-NBlog : [http://liulin.pro/zxqax/](http://liulin.pro/zxqax/)
+NBlog : [http://nblog.org.cn](http://nblog.org.cn)
 
 ## 网页详情
 ### 1、登录注册页
