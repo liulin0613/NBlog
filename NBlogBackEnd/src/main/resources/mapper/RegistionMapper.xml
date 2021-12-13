@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zxqax.nblog.dao.RegisterDao">
+
+    <!-- 表名   -->
+    <sql id="BASE_TABLE">
+        tb_user_info
+    </sql>
+
+    <!-- 基本列   -->
+    <sql id="BASE_COLUMN">
+        u.id,u.name,u.pwd,u.email,u.avator,u.intro,u.is_disable,u.create_time,u.update_time
+    </sql>
+
+    <insert id="userRegistration">
+        INSERT INTO
+            <include refid="BASE_TABLE" />
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            name,pwd,email,create_time,update_time
+        </trim>
+        <trim prefix="VALUES(" suffix=")" suffixOverrides=",">
+            #{name},
+            #{pwd},
+            #{email},
+            NOW(),
+            NOW()
+        </trim>
+    </insert>
+
+</mapper>

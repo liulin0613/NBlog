@@ -1,78 +1,146 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.cyslin.blog.mapper.UserMapper">
-    <insert id="addUser">
-        insert into user (u_name,u_pwd,u_email,u_time) values (#{name},#{pwd},#{email},#{time});
+<mapper namespace="com.zxqax.nblog.dao.UserDao">
+
+    <!-- 表名   -->
+    <sql id="BASE_TABLE">
+        tb_user_info
+    </sql>
+
+    <!-- 基本列   -->
+    <sql id="BASE_COLUMN">
+        u.id,u.name,u.pwd,u.email,u.avatar,u.intro,u.is_disable,u.create_time,u.update_time
+    </sql>
+
+    <!-- 关注表   -->
+    <sql id="ATTENTION_TABLE">
+        tb_follow
+    </sql>
+
+    <!-- 收藏表   -->
+    <sql id="Favorite_TABLE">
+        tb_favorites
+    </sql>
+
+    <insert id="addFollow">
+        INSERT INTO
+            <include refid="ATTENTION_TABLE" />
+            (u_id,f_id,`time`)
+        VALUES
+            (#{uid},#{fid},NOW())
     </insert>
-    <insert id="addfollow">
-        insert into follow(u_id,f_id) values (#{uid},#{fid})
+
+    <insert id="addFavorites">
+        INSERT INTO
+            <include refid="Favorite_TABLE" />
+            (u_id,a_id,`time`)
+        VALUES
+            (#{uid},#{aid},NOW())
     </insert>
-    <insert id="addAlertHistory">
-        insert into alertname (al_old,al_new,al_time) values (#{oldname},#{name},#{time});
+    <insert id="addLike">
+        insert into tb_like (u_id,l_id,time) values (#{uid} , #{aid} ,NOW())
     </insert>
-    <update id="alertUserName">
-        update user set u_name=#{name} where u_name=#{oldname}
+    <update id="updateImg">
+        update tb_user_info set avatar=#{img} , update_time = NOW() where id=#{id}
     </update>
-    <update id="alertArticleName">
-        update article set a_author=#{name} where a_author=#{oldname}
+    <update id="updateUserName">
+        update tb_user_info set name = #{name} where id =#{user}
     </update>
-    <update id="alertDraftName">
-        update draft set d_author=#{name} where d_author=#{oldname}
+    <update id="updateUserIntro">
+        update tb_user_info set intro = #{intro} where id =#{user}
     </update>
-    <update id="alertPwd">
-        update user set u_pwd=#{pwd} where u_name=#{name}
+    <update id="updateUserPwd">
+        update tb_user_info set pwd = #{pwd} where id =#{user}
     </update>
-    <delete id="deletefollow">
-        delete from follow where u_id=#{uid} and f_id=#{fid}
+
+    <delete id="deleteFollow">
+        DELETE FROM
+            <include refid="ATTENTION_TABLE" />
+        WHERE
+            u_id=#{uid} and f_id=#{fid}
+    </delete>
+    <delete id="deleteFavorites">
+        DELETE FROM
+            <include refid="Favorite_TABLE"/>
+        WHERE
+            u_id=#{uid} and a_id=#{aid}
+    </delete>
+    <delete id="deleteLike">
+        delete from tb_like where u_id=#{uid} and l_id=#{aid}
     </delete>
 
-    <select id="Checkname" resultType="java.lang.Integer">
-        select count(*) from user where u_name=#{name}
+    <select id="checkIfTheUserNameExists" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+           <include refid="BASE_TABLE" /> as u
+        WHERE
+            u.name=#{name} and u.is_disable = 0
     </select>
-    <select id="getPwdByName" resultType="java.lang.String">
-        select u_pwd from user where u_name=#{name} and u_state=1
+
+    <select id="checkIfTheEmailExists" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            <include refid="BASE_TABLE" /> as u
+        WHERE
+            u.email=#{email} and u.is_disable = 0
     </select>
-    <select id="Checkemail" resultType="java.lang.Integer">
-        select count(*) from user where u_email=#{email} and u_state=1
+
+    <select id="getInfo" resultType="com.zxqax.nblog.entity.UserInfo">
+        SELECT
+            <include refid="BASE_COLUMN" />
+        FROM
+            <include refid="BASE_TABLE" /> as u
+        WHERE
+            u.name = #{name}
+        Limit 1
     </select>
-    <select id="getNameByEmail" resultType="java.lang.String">
-        select u_name from user where u_email=#{email}
+
+    <select id="getIs_Favorites" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            <include refid="Favorite_TABLE" />
+        WHERE
+            u_id=#{uid} and a_id=#{aid}
     </select>
-    <select id="getuIdByName" resultType="java.lang.Integer">
-        select u_id from user where u_name=#{name}
+
+    <select id="getIs_Attention" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            <include refid="ATTENTION_TABLE" /> as att ,
+            <include refid="com.zxqax.nblog.dao.ArticleDao.BASE_TABLE"/> as a
+        WHERE
+            att.f_id=a.user_id and att.u_id=#{uid} and a.id = #{fid}
     </select>
-    <select id="hasfollow" resultType="java.lang.Integer">
-        select count(*) from follow where u_id=#{uid} and f_id=#{fid}
+    <select id="ArticleInfo" resultType="com.zxqax.nblog.vo.ArticleInfoVO">
+        SELECT
+            (select count(*) from tb_article where user_id = #{user} and is_delete=0 ) count,
+            a_id aid,
+            (select article_title  from tb_article where id=a_id) title,
+            count(*) total
+            from tb_view where a_id in (select id from tb_article where user_id = #{user} and is_delete=0)
+            GROUP BY a_id
+            ORDER BY total desc limit 1
     </select>
-    <select id="getAllfollows" resultType="java.lang.Integer">
-        select f_id from follow where u_id=#{uid}
+    <select id="getAtts" resultType="com.zxqax.nblog.dto.UserDTO">
+        select name u_name,avatar,id from tb_user_info where id in (select f_id from tb_follow where u_id =#{user} and f_id != u_id)
     </select>
-    <select id="getNameByID" resultType="java.lang.String">
-        select u_name from user where u_id=#{follow}
+    <select id="getFans" resultType="com.zxqax.nblog.dto.UserDTO">
+        select name u_name,avatar ,id from tb_user_info where id in (select u_id from tb_follow where f_id =#{user} and f_id != u_id)
     </select>
-    <select id="getTimeByID" resultType="java.lang.String">
-        select u_time from user where u_id=#{follow}
+    <select id="getAllFollow" resultType="com.zxqax.nblog.dto.AttDTO">
+        SELECT u.id, u.name,u.create_time `time`, avatar,intro,
+            (SELECT count(*) from tb_follow where u.id = f_id and u_id in (select id from tb_user_info)) fans_count,
+            (SELECT count(*) from tb_follow where u.id = u_id and f_id in (select id from tb_user_info)) att_count,
+            (SELECT count(*) from tb_article WHERE user_id = u.id and is_delete = 0 and status != 2) article_count
+            from tb_user_info u where u.id  in
+						( select DISTINCT f.f_id from tb_follow f where f.u_id = #{user} and f.f_id in  (select id from tb_user_info))
     </select>
-    <select id="getfollowcount" resultType="java.lang.Integer">
-        select count(*) from follow where u_id=#{follow}
-    </select>
-    <select id="getfanscount" resultType="java.lang.Integer">
-        select count(*) from follow where f_id=#{follow}
-    </select>
-    <select id="getarticlecount" resultType="java.lang.Integer">
-        select count(*) from article where a_author=#{aname} and a_state='1' and a_scope!='私密'
-    </select>
-    <select id="getPublishedByName" resultType="com.cyslin.blog.bean.Article">
-        select a_id,a_title,a_time
-        from article  where a_author=#{name} and a_state='1' and a_scope!='私密' ORDER BY a_id desc
-    </select>
-    <select id="getEmailbyName" resultType="java.lang.String">
-        select u_email from user where u_name=#{name}
-    </select>
-    <select id="hasCard" resultType="java.lang.Integer">
-        select count(*) from alertname where al_new=#{name}
-    </select>
-    <select id="getAlertTime" resultType="java.lang.String">
-         select al_time from alertname where al_new=#{name}
+    <select id="getPublishedByID" resultType="com.zxqax.nblog.dto.ArticleDTO">
+        select id,article_title title,update_time create_time
+        from tb_article  where user_id=#{id} and is_delete=0 and status!=2 ORDER BY update_time desc
     </select>
 </mapper>

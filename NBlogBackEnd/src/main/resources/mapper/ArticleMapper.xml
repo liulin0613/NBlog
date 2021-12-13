@@ -1,80 +1,222 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.cyslin.blog.mapper.ArticleMapper">
+<mapper namespace="com.zxqax.nblog.dao.ArticleDao">
 
-    <insert id="addArticle">
-        insert into article (a_title,a_tags,a_scope,a_content,a_time,a_author)
-        values (#{title},#{tags},#{scope},#{content},#{time},#{author})
-    </insert>
-    <insert id="addfavorites">
-        insert into favorites (u_id,a_id,f_time) values (#{uid},#{aid},#{time})
+    <!-- 表名   -->
+    <sql id="BASE_TABLE">
+        tb_article
+    </sql>
+
+    <!-- 基本列   -->
+    <sql id="BASE_COLUMN">
+        a.id,a.user_id,a.article_title,a.article_content,a.article_desc,a.article_tags,a.article_dir,
+        a.is_top,a.is_delete,a.status,a.create_time,a.update_time
+    </sql>
+
+    <!--  用户表  -->
+    <sql id="TABLE_USER_INFO">
+        <include refid="com.zxqax.nblog.dao.UserDao.BASE_TABLE" />
+    </sql>
+
+    <insert id="addview">
+        insert into tb_view (u_id,a_id,time) values (#{user},#{aid},NOW())
     </insert>
     <insert id="addDraft">
-        insert into draft (d_title,d_tags,d_scope,d_content,d_time,d_author)
-        values (#{title},#{tags},#{scope},#{content},#{time},#{author})
+        insert into tb_draft (user_id,title,content,tags,scope,create_time,update_time)
+        values (#{userId},#{title},#{content},#{tags},#{scope},NOW(),NOW())
     </insert>
-    <update id="deleteArticle">
-        update article set a_state=0 where a_id=#{aid}
+    <insert id="addArticle" parameterType="com.zxqax.nblog.entity.Article" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_article (user_id,article_title,article_content,article_desc,article_tags,status,create_time,update_time,img)
+            values (#{userId},#{articleTitle},#{articleContent},#{articleDesc},#{articleTags},#{status},NOW(),NOW(),#{img})
+    </insert>
+    <insert id="addDir">
+        insert into tb_dir (user_id,title,time) value (#{user},#{dirName},NOW())
+    </insert>
+    <update id="updateArticlePath">
+        update tb_article set article_content=#{path} where id=#{aid}
     </update>
-    <delete id="deletefavorites">
-        delete from favorites where u_id=#{uid} and a_id=#{aid}
-    </delete>
-    <delete id="deleteDraft">
-        update draft set d_state=0 where d_id=#{did}
-    </delete>
-    <select id="getArticleData" resultType="com.cyslin.blog.bean.Article">
-        select a_id,a_title,a_tags,a_scope,LEFT(a_content,200) as a_content,a_time,a_author
-        from article where a_state=1 and a_scope='公开'
-        ORDER BY a_id desc limit #{page},#{limit}
+    <update id="updateImg">
+        update tb_article set img=#{img} where id=#{id}
+    </update>
+    <update id="deleteArticle">
+        update tb_article set is_delete=1 where id=#{aid}
+    </update>
+    <update id="removeArticle">
+        update tb_article set article_dir=#{did} where id=#{aid}
+    </update>
+    <update id="reEditorSubmit">
+        update tb_article set article_title=#{articleTitle},article_desc=#{articleDesc}, `status`=#{status},
+        article_tags=#{articleTags},is_delete=0,update_time=NOW(),img=#{img} where id=#{userId}
+    </update>
+    <update id="updateDir">
+        update tb_article set article_dir = 0 where article_dir = #{did}
+    </update>
+    <update id="deleteDir">
+        update tb_dir set state= 0 where id=#{did}
+    </update>
+    <update id="deleteDraft">
+        update tb_draft set status = 0 where id =#{did}
+    </update>
+    <!--  获取文章总数  -->
+    <select id="getTotalArticleCount" resultType="java.lang.Integer">
+        SELECT
+            count(*)
+        FROM
+            <include refid="BASE_TABLE" /> as a
+        WHERE
+            a.is_delete = 0 and a.status = 1
     </select>
-    <select id="getDetailsById" resultType="com.cyslin.blog.bean.Article">
-        select a_title,a_tags,a_content,a_time,a_author
-        from article where a_id=#{id}
+
+    <!--  通过分页获取文章  -->
+    <select id="getArticlesByPagination" resultType="com.zxqax.nblog.vo.ArticlePageVO">
+        SELECT
+            a.id id,
+            a.user_id,
+            u.`name` author,
+            a.article_title title,
+            a.article_desc `desc`,
+            a.article_tags tags,
+            a.is_top ,
+            a.create_time,
+            a.update_time,
+            img
+        FROM
+            <include refid="BASE_TABLE" /> AS a ,
+            <include refid="TABLE_USER_INFO" /> AS u
+        WHERE
+            a.user_id=u.id and a.is_delete = 0 and a.status = 1
+        ORDER BY
+            a.is_top desc, a.id desc
+        LIMIT
+            #{page},#{limit}
 
     </select>
-    <select id="getHotTags" resultType="java.lang.String">
-        SELECT a_tags FROM article where a_state=1  and a_scope='公开'
+    <select id="getArticleDetailsByID" resultType="com.zxqax.nblog.dto.ArticleDetailsDTO">
+        SELECT
+            a.user_id author_id,
+            u.`name` `name`,
+            a.article_title title,
+            a.article_content content,
+            a.article_tags tags,
+            a.create_time,
+            a.update_time,
+            (	SELECT
+                    count(*) FROM tb_view as v
+                WHERE v.a_id = #{id}
+            ) all_view,
+            (	SELECT
+                    count(*) FROM tb_like as l
+                WHERE l.l_id = #{id}
+            ) all_like,
+            (	SELECT
+                    count(*) FROM tb_favorites as f
+                WHERE f.a_id = #{id}
+            ) all_favorites
+        FROM
+            <include refid="BASE_TABLE" /> AS a ,
+            <include refid="TABLE_USER_INFO" /> AS u
+        WHERE
+            a.user_id=u.id and a.id = #{id}
+        Limit 1
     </select>
-    <select id="getArticleLen" resultType="java.lang.Integer">
-        select count(*) from article where a_state='1' and a_scope='公开'
-    </select>
-    <select id="getAllTitles" resultType="com.cyslin.blog.bean.Article">
-        select a_id,a_title from article where a_state='1' and a_scope='公开' ORDER BY a_id desc
-    </select>
-    <select id="getIdByname" resultType="java.lang.Integer">
-        select u_id from user where u_name=#{name}
-    </select>
-    <select id="getPublished" resultType="com.cyslin.blog.bean.Article">
-        select a_id,a_title,LEFT(a_content,100) as a_content,a_time from article
-        where a_state=1 and a_author=#{name} ORDER BY a_id desc
 
+    <select id="getAllArticle" resultType="com.zxqax.nblog.dto.ArticleDTO">
+        SELECT
+            a.id,
+            u.`name` author,
+            a.article_title title,
+            a.article_content content,
+            a.create_time
+        FROM
+            <include refid="BASE_TABLE" /> AS a ,
+            <include refid="TABLE_USER_INFO" /> AS u
+        WHERE
+            a.user_id=u.id and a.status = 1 and a.is_delete=0
     </select>
-    <select id="getArticleInfo" resultType="com.cyslin.blog.bean.Article">
-        select a_title,a_content,a_tags,a_scope from article where a_id=#{aid}
+
+    <select id="getOthers" resultType="com.zxqax.nblog.dto.ArticleAboutUserDTO">
+        SELECT
+        ( SELECT count(*)
+            FROM tb_favorites
+            WHERE u_id=#{user} and a_id=#{aid}
+        ) is_favorites ,
+        (
+            SELECT count(*)
+            FROM tb_follow
+            WHERE u_id=#{user} and f_id=#{author}
+        ) is_attention,
+        (	SELECT count(*)
+            FROM tb_like
+            WHERE u_id=#{user} and l_id=#{aid}
+        ) is_like
+    </select>
+    <select id="getAllFavorites" resultType="com.zxqax.nblog.dto.FavoriteDTO">
+        select
+            id ,article_title title,(select `time` from tb_favorites where a_id = id and u_id = #{uid} limit 1) update_time
+        FROM
+            tb_article
+        where id in (select a_id from tb_favorites where u_id = #{uid}) and is_delete = 0 and `status`!=3
+        ORDER BY update_time desc
+    </select>
+    <select id="getNotArchived" resultType="com.zxqax.nblog.dto.ArticleDTO">
+        select id, article_content author , article_title title,article_desc content,update_time createTime
+        from tb_article
+        where user_id = #{user} and is_delete = 0 and article_dir = 0
+        order by update_time desc
+    </select>
+    <select id="getDirs" resultType="com.zxqax.nblog.dto.DirDTO">
+        SELECT
+            d.id id,
+            (SELECT count(*)
+             from tb_article
+             where article_dir = d.id and user_id = #{user} and is_delete = 0
+            ) count,
+            title  `name`
+        from tb_dir d
+        where state=1 and user_id = #{user}
+    </select>
+    <select id="getDirsDetails" resultType="com.zxqax.nblog.dto.ArticleDTO">
+        select id, article_content author , article_title title,article_desc content,update_time createTime
+        from tb_article
+        where user_id = #{user} and is_delete = 0 and article_dir = #{aid}
+        order by update_time desc
+    </select>
+    <select id="searchByTitle" resultType="com.zxqax.nblog.dto.ArticleDTO">
+        select id, article_content author , article_title title,article_desc content,update_time createTime
+        from tb_article
+        where user_id = #{user} and is_delete = 0 and article_title like concat('%',#{title},'%')
+    </select>
+    <select id="searchByTitleAndDir" resultType="com.zxqax.nblog.dto.ArticleDTO">
+        select id, article_content author , article_title title,article_desc content,update_time createTime
+        from tb_article
+        where user_id = #{user} and is_delete = 0 and article_title like concat('%',#{title},'%') and article_dir = #{did}
+    </select>
+    <select id="getPrintDetails" resultType="com.zxqax.nblog.dto.PrintDTO">
+        select
+            (select `name` from tb_user_info u where u.id = a.user_id) author,
+            article_tags tags,
+            (select title from tb_dir d where d.id = a.article_dir) dir
+        from tb_article a
+        where a.id = #{aid}
+    </select>
+    <select id="getRePublishArticle" resultType="com.zxqax.nblog.dto.ArticleDetailsDTO">
+        select id, user_id author_id, article_title title, article_content content,article_tags tags,`status` scope from tb_article
+        where id=#{aid}
+    </select>
+    <select id="getRecommendArticle" resultType="com.zxqax.nblog.dto.DirDTO">
+        select a_id id, (select article_title from tb_article where id= a_id and is_delete=0 and status=1) name, count(*) count
+        from tb_view where a_id in (SELECT id from tb_article where is_delete=0 and status=1) GROUP BY a_id ORDER BY count desc limit 5
+    </select>
+    <select id="getAllDraft" resultType="com.zxqax.nblog.dto.DraftDTO">
+        select id,title,update_time from tb_draft where user_id=#{user} and status = 1 order by update_time desc
+    </select>
+    <select id="getReDraftInfo" resultType="com.zxqax.nblog.entity.Draft">
+        select * from tb_draft where id=#{aid}
     </select>
     <select id="getEchartsDataByMonth" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM article where a_author=#{name} and (a_time like CONCAT(#{month},'%')) and a_state=1
+        SELECT COUNT(*) FROM tb_article where user_id = #{user} and (create_time like CONCAT(#{month},'%')) and is_delete = 0
     </select>
     <select id="getEchartsDataByYear" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM article where a_author=#{name} and (a_time like CONCAT(#{year},'%')) and a_state=1
-    </select>
-    <select id="getTagArticleData" resultType="com.cyslin.blog.bean.Article">
-        select a_id,a_title,a_tags,a_scope,LEFT(a_content,200) as a_content,a_time,a_author
-        from article where a_state=1 and a_scope='公开'
-        and a_tags LIKE CONCAT('%',#{tagname},'%') ORDER BY a_id desc
-    </select>
-    <select id="hasfavorites" resultType="java.lang.Integer">
-        select count(*) from favorites where u_id=#{uid} and a_id=#{aid}
-    </select>
-    <select id="getAllfavorites" resultType="com.cyslin.blog.bean.Article">
-        select a.a_id,a_title,f.f_time as a_time
-        from article a, favorites f where f.a_id=a.a_id and f.u_id=#{uid} ORDER BY a_id desc
-    </select>
-    <select id="getAllDraft" resultType="com.cyslin.blog.bean.Article">
-        select d_id a_id,d_title a_title,d_time a_time from draft
-        where d_state=1 and d_author=#{name} ORDER BY d_id desc
-    </select>
-    <select id="getDraftInfo" resultType="com.cyslin.blog.bean.Article">
-        select d_title a_title,d_content a_content,d_tags a_tags,d_scope a_scope from draft where d_id=#{did}
+        SELECT COUNT(*) FROM tb_article where user_id = #{user} and (create_time like CONCAT(#{year},'%')) and is_delete = 0
     </select>
 </mapper>
