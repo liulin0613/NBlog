@@ -36,7 +36,6 @@ public class RegisterController {
      * @return 是否注册成功
      */
     @PostMapping("/userRegistration")
-    @CrossOrigin
     @ApiOperation(value = "用户注册")
     @LogAnnotation(optType = REGISTER)
     public Result<?> userRegistration(@RequestParam(value = "name") String name,

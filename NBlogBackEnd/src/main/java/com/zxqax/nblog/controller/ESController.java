@@ -26,7 +26,6 @@ public class ESController {
      * @return 是否存在
      */
     @PostMapping("/search")
-    @CrossOrigin
     public Result<?> search(@RequestParam(value = "content") String content,
                             @RequestParam(value = "type") int type){
         return esService.search(content,type);

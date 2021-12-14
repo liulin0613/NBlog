@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://your_host:your_post/your_dataset?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&autoReconnectForPools=true
-    username: your_username
-    password: your_password
+    url: jdbc:mysql://sh-cynosdbmysql-grp-72db1xlk.sql.tencentcdb.com:22462/nblog?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&autoReconnectForPools=true
+    username: root
+    password: MJBkh.HrDgd9-j9
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   mvc:
@@ -14,9 +14,9 @@ spring:
       max-request-size: 10MB
 
   redis:
-    host: your_host
-    port: your_post
-    password: your_password
+    host: 49.232.66.58
+    port: 6379
+    password: 131214
 
   aop:
     auto: true
@@ -29,4 +29,4 @@ mybatis:
     map-underscore-to-camel-case: true
 
 server:
-  port: your_post         
+  port: 260         

@@ -35,7 +35,6 @@ public class LoginController {
      * @return 是否存在
      */
     @PostMapping("/checkIfTheUserNameExists")
-    @CrossOrigin
     @ApiOperation(value = "检查用户名是否存在")
     public Result<?> checkIfTheUserNameExists(@RequestParam(value = "name") String name){
         return userService.checkIfTheUserNameExists(name);
@@ -47,7 +46,6 @@ public class LoginController {
      * @return 是否存在
      */
     @PostMapping("/checkIfTheEmailExists")
-    @CrossOrigin
     @ApiOperation(value = "检查邮箱是否存在")
     public Result<?> checkIfTheEmailExists(@RequestParam(value = "email") String email){
         return userService.checkIfTheEmailExists(email);
@@ -59,7 +57,6 @@ public class LoginController {
      * @return Result 信息 是否发送成功
      */
     @PostMapping("/sendEmailVerificationCode")
-    @CrossOrigin
     @ApiOperation(value = "发送邮箱验证码")
     @LogAnnotation(optType = SEND)
     public Result<?> sendEmailVerificationCode(@RequestParam(value = "email") String email){
@@ -73,7 +70,6 @@ public class LoginController {
      * @return 是否登录成功
      */
     @PostMapping("/loginViaUserNameAndPassword")
-    @CrossOrigin
     @ApiOperation(value = "用户名 + 密码 登录")
     @LogAnnotation(optType = LOGIN)
     public Result<?> loginViaUserNameAndPassword(@RequestParam(value = "name") String name,
@@ -88,7 +84,6 @@ public class LoginController {
      * @return Msg 信息 其中 is_login 属性 表明是否登录成功
      */
     @PostMapping("/loginViaEmail")
-    @CrossOrigin
     @ApiOperation(value = "邮箱登录")
     @LogAnnotation(optType = LOGIN)
     public Result<?> loginViaEmail(@RequestParam(value ="email") String email){
@@ -96,7 +91,6 @@ public class LoginController {
     }
 
     @PostMapping("/exit")
-    @CrossOrigin
     @ApiOperation(value = "退出登录")
     public Result<?> exit(){
         return loginService.exit();

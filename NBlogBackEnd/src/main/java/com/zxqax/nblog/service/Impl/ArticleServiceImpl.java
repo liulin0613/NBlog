@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 @Service
 @Slf4j
 public class ArticleServiceImpl implements ArticleService {
-    private final String SERVER_PATH=your_server_path; // md文件保存路径
+    private final String SERVER_PATH=File.separator + "static" + File.separator+ "mds" + File.separator;
 
     /**
      * Spring 自动注入

@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ElasticSearchConfig {
 
-    private final String ES_HOST = "your_host";
-    private final Integer ES_PORT = "your_post";
+    private final String ES_HOST = "nblog.org.cn";
+    private final Integer ES_PORT = 9200;
     private final String ES_SCHEME = "http";
 
 

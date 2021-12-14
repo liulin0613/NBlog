@@ -32,7 +32,6 @@ public class UserController {
      * @return addFollow true or false
      */
     @PostMapping("/addFollow")
-    @CrossOrigin
     @ApiOperation(value = "添加关注")
     @LogAnnotation(optType = SAVE)
     public Result<?> addFollow(@RequestParam(value = "fid") int fid){
@@ -45,7 +44,6 @@ public class UserController {
      * @return addFollow true or false
      */
     @PostMapping("/deleteFollow")
-    @CrossOrigin
     @ApiOperation(value = "删除关注")
     @LogAnnotation(optType = REMOVE)
     public Result<?> deleteFollow(@RequestParam(value = "fid") int fid){
@@ -58,7 +56,6 @@ public class UserController {
      * @return  Result addFavorites true or false
      */
     @PostMapping("/addFavorites")
-    @CrossOrigin
     @ApiOperation(value = "添加 博文收藏 ")
     @LogAnnotation(optType = SAVE)
     public Result<?> addFavorites(@RequestParam(value = "aid") int aid){
@@ -71,7 +68,6 @@ public class UserController {
      * @return  Result deleteFavorites true or false
      */
     @PostMapping("/deleteFavorites")
-    @CrossOrigin
     @ApiOperation(value = "删除 博文收藏")
     @LogAnnotation(optType = REMOVE)
     public Result<?> deleteFavorites(@RequestParam(value = "aid") int aid){
@@ -84,7 +80,6 @@ public class UserController {
      * @return  Result addLike true or false
      */
     @PostMapping("/addLike")
-    @CrossOrigin
     public Result<?> addLike(@RequestParam(value = "aid") int aid){
         return userService.addLike(aid);
     }
@@ -95,7 +90,6 @@ public class UserController {
      * @return  Result deleteLike true or false
      */
     @PostMapping("/deleteLike")
-    @CrossOrigin
     public Result<?> deleteLike(@RequestParam(value = "aid") int aid){
         return userService.deleteLike(aid);
     }
@@ -105,7 +99,6 @@ public class UserController {
      * @return  Result deleteFavorites true or false
      */
     @PostMapping("/checkExpiration")
-    @CrossOrigin
     public Result<?> checkExpiration(){
         return userService.checkExpiration();
     }
@@ -115,7 +108,6 @@ public class UserController {
      * @return
      */
     @PostMapping("/getArticleInfo")
-    @CrossOrigin
     public Result<?> getArticleInfo(){
         return userService.getArticleInfo();
     }
@@ -125,7 +117,6 @@ public class UserController {
      * @return
      */
     @PostMapping("/getSocialInfo")
-    @CrossOrigin
     public Result<?> getSocialInfo(){
         return userService.getSocialInfo();
     }
@@ -135,7 +126,6 @@ public class UserController {
      * @return
      */
     @PostMapping("/alertAvatar")
-    @CrossOrigin
     @ApiOperation(value = "修改头像")
     @LogAnnotation(optType = UPDATE)
     public Result<?> alertAvatar(String img){
@@ -147,7 +137,6 @@ public class UserController {
      * @return
      */
     @PostMapping("/updateUserName")
-    @CrossOrigin
     @ApiOperation(value = "修改用户名")
     @LogAnnotation(optType = UPDATE)
     public Result<?> updateUserName(String name){
@@ -159,7 +148,6 @@ public class UserController {
      * @return
      */
     @PostMapping("/updateUserIntro")
-    @CrossOrigin
     @ApiOperation(value = "修改用户简介")
     @LogAnnotation(optType = UPDATE)
     public Result<?> updateUserIntro(String intro){
@@ -171,7 +159,6 @@ public class UserController {
      * @return
      */
     @PostMapping("/updateUserPwd")
-    @CrossOrigin
     @ApiOperation(value = "修改用户密码")
     @LogAnnotation(optType = UPDATE)
     public Result<?> updateUserPwd(String pwd){
@@ -183,25 +170,21 @@ public class UserController {
      * @return
      */
     @PostMapping("/getAllFollow")
-    @CrossOrigin
     public Result<?> getAllFollow(){
         return userService.getAllFollow();
     }
 
     @PostMapping("/getPublishedByID")
-    @CrossOrigin
     public Result<?> getPublishedByID(int id){
         return userService.getPublishedByID(id);
     }
 
     @PostMapping("/addViews")
-    @CrossOrigin
     public Result<?> addViews(){
         return userService.addViews();
     }
 
     @PostMapping("/getViews")
-    @CrossOrigin
     public Result<?> getViews(){
         return userService.getViews();
     }

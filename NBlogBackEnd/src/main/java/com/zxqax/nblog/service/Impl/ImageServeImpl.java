@@ -20,8 +20,8 @@ import java.util.UUID;
 @Slf4j
 public class ImageServeImpl implements ImageService {
 
-    private final String SERVER_PATH=your_server_path; // 图片保存路径
-    private final String Avatar_SERVER_PATH = your_avatar_server_path; // 头像保存路径
+    private final String SERVER_PATH=File.separator + "static" + File.separator+ "images" + File.separator;
+    private final String Avatar_SERVER_PATH = File.separator + "static" + File.separator+ "avatar" + File.separator;
 
     @Autowired
     UserService userService;

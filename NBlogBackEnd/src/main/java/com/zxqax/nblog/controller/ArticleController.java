@@ -39,7 +39,6 @@ public class ArticleController {
      * @return Result 包含文章列表信息
      */
     @PostMapping("/getArticlesByPagination")
-    @CrossOrigin
     @ApiOperation(value = "分页获取文章")
     public Result<ArticlePageDTO> getArticlesByPagination(@RequestParam(value = "page") int page,
                                                           @RequestParam(value = "limit") int limit){
@@ -53,7 +52,6 @@ public class ArticleController {
      * @return 一篇文章的详情
      */
     @PostMapping("/getArticleDetailsByID")
-    @CrossOrigin
     @ApiOperation(value = "查看文章")
     @LogAnnotation(optType = SELECT)
     public Result<?> getArticleDetailsByID(int id){
@@ -66,7 +64,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/addDraft")
-    @CrossOrigin
     @ApiOperation(value = "添加草稿")
     @LogAnnotation(optType = SAVE_OR_UPDATE)
     public Result<?> addDraft(ArticleVO articleVO){
@@ -79,7 +76,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/addArticle")
-    @CrossOrigin
     @ApiOperation(value = "添加文章")
     @LogAnnotation(optType = SAVE)
     public Result<?> addArticle(ArticleVO articleVO){
@@ -91,7 +87,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getAllFavorites")
-    @CrossOrigin
     public Result<?>  getAllFavorites(){
         return articleService.getAllFavorites();
     }
@@ -101,7 +96,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getNotArchived")
-    @CrossOrigin
     public Result<?>  getNotArchived(){
         return articleService.getNotArchived();
     }
@@ -111,7 +105,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getDirs")
-    @CrossOrigin
     public Result<?>  getDirs(){
         return articleService.getDirs();
     }
@@ -121,7 +114,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getDirsDetails")
-    @CrossOrigin
     public Result<?>  getDirsDetails(int aid){
         return articleService.getDirsDetails(aid);
     }
@@ -131,7 +123,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/searchByTitleAndDir")
-    @CrossOrigin
     public Result<?>  searchByTitleAndDir(String title,int did){
         return articleService.searchByTitleAndDir(title,did);
     }
@@ -142,7 +133,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/deleteArticle")
-    @CrossOrigin
     @ApiOperation(value = "删除文章")
     @LogAnnotation(optType = REMOVE)
     public Result<?>  deleteArticle(int aid){
@@ -154,7 +144,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/addDir")
-    @CrossOrigin
     @ApiOperation(value = "创建文件夹")
     @LogAnnotation(optType = SAVE)
     public Result<?>  addDir(String dirName){
@@ -168,7 +157,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/removeArticle")
-    @CrossOrigin
     public Result<?>  removeArticle(int aid,int did){
         return articleService.removeArticle(aid,did);
     }
@@ -179,7 +167,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/printDetails")
-    @CrossOrigin
     public Result<?>  getPrintDetails(int aid){
         return articleService.getPrintDetails(aid);
     }
@@ -191,7 +178,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getRePublishArticle")
-    @CrossOrigin
     public Result<?>  getRePublishArticle(int aid){
         return articleService.getRePublishArticle(aid);
     }
@@ -202,7 +188,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/reEditorSubmit")
-    @CrossOrigin
     @ApiOperation(value = "保存重新编辑的文章")
     @LogAnnotation(optType = SAVE)
     public Result<?> reEditorSubmit(ArticleVO articleVO){
@@ -214,7 +199,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getRecommendArticle")
-    @CrossOrigin
     public Result<?> getRecommendArticle(){
         return articleService.getRecommendArticle();
     }
@@ -224,7 +208,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/deleteDir")
-    @CrossOrigin
     @ApiOperation(value = "删除文件夹")
     @LogAnnotation(optType = REMOVE)
     public Result<?> deleteDir(int did){
@@ -236,7 +219,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getAllDraft")
-    @CrossOrigin
     public Result<?> getAllDraft(){
         return articleService.getAllDraft();
     }
@@ -246,7 +228,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/deleteDraft")
-    @CrossOrigin
     @ApiOperation(value = "删除草稿")
     @LogAnnotation(optType = REMOVE)
     public Result<?> deleteDraft(int did){
@@ -258,7 +239,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getReDraftInfo")
-    @CrossOrigin
     public Result<?> getReDraftInfo(int aid){
         return articleService.getReDraftInfo(aid);
     }
@@ -268,7 +248,6 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/getEchartsData")
-    @CrossOrigin
     public Result<?> getEchartsData(){
         return articleService.getEchartsData();
     }

@@ -33,7 +33,6 @@ public class TagController {
      * @return tag
      */
     @PostMapping("/getHotTags")
-    @CrossOrigin
     public Result<List<TagDTO>> getHotTags(){
         return tagService.getHotTags();
     }
@@ -43,7 +42,6 @@ public class TagController {
      * @return tag
      */
     @PostMapping("/getAllTags")
-    @CrossOrigin
     public Result<List<TagDTO>> getAllTags(){
         return tagService.getAllTags();
     }
@@ -54,7 +52,6 @@ public class TagController {
      * @return Msg
      */
     @PostMapping("/getTagArticleData")
-    @CrossOrigin
     public Result<List<TagArticleDTO>> getTagArticleData(@RequestParam(value = "tagname") String tagname){
         return tagService.getTagArticleData(tagname);
     }

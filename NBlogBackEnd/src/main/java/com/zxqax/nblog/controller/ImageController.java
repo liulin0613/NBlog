@@ -36,7 +36,6 @@ public class ImageController {
      * @return result
      */
     @PostMapping("/upload")
-    @CrossOrigin
     @ApiOperation(value = "图片上传")
     @LogAnnotation(optType = UPLOAD)
     public Result<?> upload(@RequestParam("file") String file){
@@ -49,7 +48,6 @@ public class ImageController {
      * @return result
      */
     @PostMapping("/del")
-    @CrossOrigin
     @ApiOperation(value = "图片删除")
     @LogAnnotation(optType = REMOVE)
     public Result<?> delImg(@RequestParam("path") String path){
