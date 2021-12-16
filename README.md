@@ -1,5 +1,5 @@
 # NBlog
-SpringBoot + vue + Element-UI 搭建的个人博客系统
+SpringBoot + vue + Element-UI 搭建的博客系统
 
 ## 网站访问连接：
 NBlog : [http://nblog.org.cn](http://nblog.org.cn)
@@ -29,7 +29,7 @@ NBlog : [http://nblog.org.cn](http://nblog.org.cn)
 ![main](http://nblog.org.cn/images/readme/06.png)
 
 
-您的star是我坚持的动力，感谢大家的支持
+您的 star 是我坚持的动力，感谢大家的支持
 
 
 - 本项目部分参考 [X1192176811 风丶宇](https://github.com/X1192176811/blog) 大佬的博客
