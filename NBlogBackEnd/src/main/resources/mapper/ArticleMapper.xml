@@ -219,4 +219,7 @@
     <select id="getEchartsDataByYear" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM tb_article where user_id = #{user} and (create_time like CONCAT(#{year},'%')) and is_delete = 0
     </select>
+    <select id="getScopeByID" resultType="java.lang.Integer">
+        select `status` from tb_article where id = #{aid}
+    </select>
 </mapper>

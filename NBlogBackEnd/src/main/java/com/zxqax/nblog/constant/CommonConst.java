@@ -7,16 +7,6 @@ package com.zxqax.nblog.constant;
 
 public class CommonConst {
     /**
-     * 否
-     */
-    public static final int FALSE = 0;
-
-    /**
-     * 是
-     */
-    public static final int TRUE = 1;
-
-    /**
      * 作者搜索 高亮标签
      */
     public static final String PRE_AUTHOR_TAG = "<span style='color:#f47466'>";
@@ -44,7 +34,7 @@ public class CommonConst {
     /**
      * 默认用户头像
      */
-    public static final String DEFAULT_AVATAR = "https://www.static.talkxj.com/avatar/user.png";
+    public static final String DEFAULT_AVATAR = "http://nblog.org.cn/avatar/default_avatar.png";
 
     /**
      * 未知的

@@ -208,4 +208,11 @@ public interface ArticleDao {
      * @return
      */
     int getEchartsDataByYear(@Param("user")  int user, @Param("year") String s);
+
+    /**
+     * 根据id获取文章的 scope
+     * @param aid
+     * @return
+     */
+    int getScopeByID(int aid);
 }

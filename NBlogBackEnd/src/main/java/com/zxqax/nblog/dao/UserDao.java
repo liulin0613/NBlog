@@ -156,4 +156,11 @@ public interface UserDao {
      * @return
      */
     List<ArticleDTO> getPublishedByID(int id);
+
+    /**
+     * 获取用户名
+     * @param userId
+     * @return
+     */
+    String getNameByID(Integer userId);
 }

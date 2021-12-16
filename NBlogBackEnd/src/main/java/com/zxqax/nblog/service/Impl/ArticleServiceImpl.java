@@ -1,5 +1,6 @@
 package com.zxqax.nblog.service.Impl;
 
+import com.alibaba.fastjson.JSON;
 import com.zxqax.nblog.constant.CommonConst;
 import com.zxqax.nblog.dao.ArticleDao;
 import com.zxqax.nblog.dto.*;
@@ -15,6 +16,7 @@ import com.zxqax.nblog.utils.ThreadUtils;
 import com.zxqax.nblog.vo.ArticlePageVO;
 import com.zxqax.nblog.vo.ArticleVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.zxqax.nblog.constant.MQPrefixConst.ES_EXCHANGE;
 
 @Service
 @Slf4j
@@ -39,12 +43,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final UserService userService;
 
-    private final ESService esService;
+    private final RabbitTemplate rabbitTemplate;
 
-    public ArticleServiceImpl(ArticleDao articleDao, UserService userService,ESService esService){
+    public ArticleServiceImpl(ArticleDao articleDao, UserService userService,ESService esService,RabbitTemplate rabbitTemplate){
         this.articleDao=articleDao;
         this.userService = userService;
-        this.esService=esService;
+        this.rabbitTemplate=rabbitTemplate;
     }
 
     /**
@@ -150,48 +154,9 @@ public class ArticleServiceImpl implements ArticleService {
             articleDao.addArticle(article);
 
             // 异步线程操作 ES 和 磁盘
-            ThreadUtils.getExecutorService().execute(()->{
-                // 写入磁盘
-                String base=SERVER_PATH + current_user_id + File.separator;
-                String fileName=article.getArticleTitle()+"_"+article.getId();
-                // 格式化文件名
-                fileName=regName(fileName);
-                File file=new File(base);
-                if (!file.exists()){
-                    boolean success=file.mkdirs();
-                    String event="为用户 [ "+article.getUserId()+" ] 创建 md 文件夹 "+success;
-                    log.info(event);
-                }
+            article.setArticleContent(content);
+            rabbitTemplate.convertAndSend(ES_EXCHANGE,"", JSON.toJSONString(article));
 
-                // 写入文件
-                BufferedWriter out = null;
-                try {
-                    out = new BufferedWriter(new FileWriter(base+ fileName+".md"));
-                    out.write(content);
-                    out.close();
-
-                    // 更新数据库中的文件路径
-                    articleDao.updateArticlePath(article.getId(),fileName+".md");
-
-                    // 插入 ES
-                    ArticleDTO esArticle = new ArticleDTO();
-                    esArticle.setAuthor(userService.getCurrentUser().getName());
-                    esArticle.setContent(content);
-
-                    Date date =new Date();
-                    SimpleDateFormat df = ThreadLocalUtils.localSimpleDataFormat.get();
-                    String time = df.format(date);
-                    esArticle.setCreateTime(time);
-                    esArticle.setId(article.getId()+"");
-                    esArticle.setTitle(articleVO.getTitle());
-
-                    // 写入 ES
-                    esService.addDocument(SearchStrategyEnum.NBLOG.getDesc(),esArticle);
-
-                } catch (IOException e) {
-                    log.error(e.getMessage());
-                }
-            });
             return Result.ok();
         }
         return Result.fail();
@@ -260,9 +225,18 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Result<?> deleteArticle(int aid) {
         articleDao.deleteArticle(aid);
-        ThreadUtils.getExecutorService().execute(()->{
-            esService.deleteDocument(SearchStrategyEnum.NBLOG.getDesc(),aid+"");
-        });
+
+        int scope = articleDao.getScopeByID(aid);
+
+        // rabbitmq 异步处理文章删除
+        if(scope == 1){
+            Article article = new Article();
+            article.setUserId(-1);
+            article.setId(aid);
+            rabbitTemplate.convertAndSend(ES_EXCHANGE,"",JSON.toJSONString(article));
+        }
+
+
         return Result.ok();
     }
 
@@ -429,23 +403,5 @@ public class ArticleServiceImpl implements ArticleService {
         }else {
             return Result.fail();
         }
-    }
-
-    private String regName(String fileName){
-        fileName=fileName.trim();
-        //  不支持的文件|文件夹命名      / \ : * " < > | ？
-        fileName=fileName.replaceAll(" ","");
-        fileName=fileName.replaceAll("/","_");
-        fileName=fileName.replaceAll("\\\\","_");
-        fileName=fileName.replaceAll(":","_");
-        fileName=fileName.replaceAll("\\*","_");
-        fileName=fileName.replaceAll("\"","_");
-        fileName=fileName.replaceAll("：","_");
-        fileName=fileName.replaceAll("<","_");
-        fileName=fileName.replaceAll(">","_");
-        fileName=fileName.replaceAll("\\|","_");
-        fileName=fileName.replaceAll("\\?","_");
-        fileName=fileName.replaceAll("[.]","_");
-        return fileName;
     }
 }

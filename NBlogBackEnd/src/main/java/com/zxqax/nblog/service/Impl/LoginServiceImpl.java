@@ -9,11 +9,14 @@ import com.zxqax.nblog.service.LoginService;
 import com.zxqax.nblog.service.RedisService;
 import com.zxqax.nblog.service.UserService;
 import com.zxqax.nblog.utils.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.zxqax.nblog.constant.MQPrefixConst.EMAIL_EXCHANGE;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -26,12 +29,15 @@ public class LoginServiceImpl implements LoginService {
 
     UserService userService;
 
+    RabbitTemplate rabbitTemplate;
+
     @Autowired
-    public LoginServiceImpl(UserDao userDao,LoginDao loginDao,RedisService redisService,UserService userService){
+    public LoginServiceImpl(UserDao userDao,LoginDao loginDao,RedisService redisService,UserService userService,RabbitTemplate rabbitTemplate){
         this.userDao =userDao;
         this.loginDao =loginDao;
         this.redisService=redisService;
         this.userService=userService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     /**
@@ -114,26 +120,25 @@ public class LoginServiceImpl implements LoginService {
 
             String code= VerificationCodeUtils.getRandomVerificationCode(4);
 
-            // 发送验证码
-            boolean has_send=EmailUtils.sendEmail(email,code);
+            // 发送验证码,使用 rabbitmq 消息队列的方式
+//            boolean has_send=EmailUtils.sendEmail(email,code);
+            Map<String,String> message = new HashMap<>(2);
+            message.put("email",email);
+            message.put("code",code);
+            rabbitTemplate.convertAndSend(EMAIL_EXCHANGE,"",message);
 
-            // 返回结果
-            if(has_send){
-                String name = loginDao.getNameByEmail(email);
-                // 用户存在，获取用户信息
-                UserInfo current_user = userDao.getInfo(name);
-                String token = TokenUtils.token(email + Math.random() * 120);
+            String name = loginDao.getNameByEmail(email);
+            // 用户存在，获取用户信息
+            UserInfo current_user = userDao.getInfo(name);
+            String token = TokenUtils.token(email + Math.random() * 120);
 
-                Map<String,Object> res =new HashMap<>();
-                res.put("code",code);
-                res.put("user",current_user);
-                res.put("token",token);
-                userService.saveUser(token,current_user);
+            Map<String,Object> res =new HashMap<>();
+            res.put("code",code);
+            res.put("user",current_user);
+            res.put("token",token);
+            userService.saveUser(token,current_user);
 
-                return Result.ok(res);
-            }else {
-                return Result.fail("验证码发送失败,请稍后重试");
-            }
+            return Result.ok(res);
         }else {
             return Result.fail("请输入正确的邮箱格式");
         }

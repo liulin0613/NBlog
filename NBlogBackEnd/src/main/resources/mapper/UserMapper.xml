@@ -143,4 +143,7 @@
         select id,article_title title,update_time create_time
         from tb_article  where user_id=#{id} and is_delete=0 and status!=2 ORDER BY update_time desc
     </select>
+    <select id="getNameByID" resultType="java.lang.String">
+        select name from tb_user_info where id=#{userId}
+    </select>
 </mapper>

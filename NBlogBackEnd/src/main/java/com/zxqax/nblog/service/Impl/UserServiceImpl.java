@@ -10,6 +10,7 @@ import com.zxqax.nblog.service.UserService;
 import com.zxqax.nblog.utils.*;
 import com.zxqax.nblog.vo.ArticleInfoVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
@@ -17,10 +18,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+import static com.zxqax.nblog.constant.MQPrefixConst.EMAIL_EXCHANGE;
 import static com.zxqax.nblog.constant.RedisPrefixConst.ONLINE;
 
 @Service
@@ -32,6 +32,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
 
     /**
      * 检查用户名是否存在
@@ -93,8 +96,12 @@ public class UserServiceImpl implements UserService {
 
         // 1. 获取验证码
         String code= VerificationCodeUtils.getRandomVerificationCode(4);
-        // 2. 发送邮箱
-        EmailUtils.sendEmail(email,code);
+        // 2. 发送邮箱,通过rabbitmq消息队列的方式
+//        EmailUtils.sendEmail(email,code);
+        Map<String,String> message = new HashMap<>(2);
+        message.put("email",email);
+        message.put("code",code);
+        rabbitTemplate.convertAndSend(EMAIL_EXCHANGE,"",message);
 
         return Result.ok(code);
     }

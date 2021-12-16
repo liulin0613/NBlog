@@ -1,13 +1,9 @@
 package com.zxqax.nblog.utils;
 
-import com.zxqax.nblog.entity.UserInfo;
 import org.springframework.stereotype.Component;
-
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Random;
 
-import static com.zxqax.nblog.constant.CommonConst.DEFAULT_AVATAR;
 
 /**
  * ThreadLocal 提供了线程内存储变量

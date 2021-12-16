@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://your_database:your_port/your_dataset?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&autoReconnectForPools=true
+    url: jdbc:mysql://your_database:your_port/nblog?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&autoReconnectForPools=true
     username: your_name
     password: your_pass
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -21,6 +21,13 @@ spring:
   aop:
     auto: true
     proxy-target-class: true
+
+  rabbitmq:
+    username: your_username
+    password: your_password
+    virtual-host:  yourvhost
+    host:  your_host
+    port: 5672
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
