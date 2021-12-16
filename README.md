@@ -8,7 +8,7 @@ NBlog : [http://nblog.org.cn](http://nblog.org.cn)
 
 - **前端**： vue + vuex + vue-router + axios + element + echarts
 
-- **后端**： SpringBoot + nginx + docker  + Swagger2 + MyBatisPlus + Mysql + Redis + elasticsearch + RabbitMQ 
+- **后端**： SpringBoot + nginx + docker  + Swagger2 + MyBatis + Mysql + Redis + elasticsearch + RabbitMQ 
 
 ## 网页截图
 
