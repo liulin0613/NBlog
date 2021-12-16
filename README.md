@@ -18,15 +18,15 @@ NBlog : [http://nblog.org.cn](http://nblog.org.cn)
 
 ![tags](http://nblog.org.cn/images/readme/02.png)
 
-![main](http://nblog.org.cn/images/readme/03.jpg)
+![main](http://nblog.org.cn/images/readme/03.png)
 
-![main](http://nblog.org.cn/images/readme/04.jpg)
+![main](http://nblog.org.cn/images/readme/04.png)
 
 >文章管理，支持文件夹方式管理文章，支持打印pdf
 
-![main](http://nblog.org.cn/images/readme/05.jpg)
+![main](http://nblog.org.cn/images/readme/05.png)
 
-![main](http://nblog.org.cn/images/readme/06.jpg)
+![main](http://nblog.org.cn/images/readme/06.png)
 
 
 您的star是我坚持的动力，感谢大家的支持
