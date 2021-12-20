@@ -1,39 +1,70 @@
 spring:
+  # MySQL 数据源配置
   datasource:
-    url: jdbc:mysql://your_database:your_port/nblog?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&autoReconnectForPools=true
-    username: your_name
-    password: your_pass
+    url: jdbc:mysql://your_ip:3306/nblog?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true&autoReconnectForPools=true
+    username: user
+    password: pwd
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  mvc:
-    static-path-pattern: /static/**
-
+  # 文件上传相关配置
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  # Redis 相关配置
   redis:
-    host: your_host
-    port: your_port
-    password: your_pass
+    host: host
+    port: port
+    password: pwd
 
+  # rabbitMQ 相关配置
+  rabbitmq:
+    username: user
+    password: user
+    virtual-host: vhost
+    host: host
+    port: 5672
+
+  # ElasticSearch 相关配置
+  elasticsearch:
+    port: 9200
+    host: host
+    scheme: http
+
+  # 开启 AOP 切面编程
   aop:
     auto: true
     proxy-target-class: true
 
-  rabbitmq:
-    username: your_username
-    password: your_password
-    virtual-host:  yourvhost
-    host:  your_host
-    port: 5672
+  # 控制 swagger 是否开启
+  swagger:
+    enable: false
 
+  # JWT 相关配置
+  audience:
+    clientId: id
+    base64Secret: secret
+    name: name
+    expiresSecond: -1
+
+# mybatis 相关配置
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.zxqax.nblog.dao
+  type-aliases-package: com.nblog.dao
   configuration:
     map-underscore-to-camel-case: true
 
+# 邮箱配置
+email:
+  port: port
+  host: smtp.qq.com
+  auth: true
+  protocol: smtp
+  enable: true
+  fromAddress: your_Address
+  password: your_password
+
+# 服务器端口配置
 server:
-  port: your_port
+  port: port

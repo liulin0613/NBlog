@@ -1,74 +1,101 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zxqax.nblog.dao.ArticleDao">
-
-    <!-- 表名   -->
-    <sql id="BASE_TABLE">
-        tb_article
-    </sql>
-
-    <!-- 基本列   -->
-    <sql id="BASE_COLUMN">
-        a.id,a.user_id,a.article_title,a.article_content,a.article_desc,a.article_tags,a.article_dir,
-        a.is_top,a.is_delete,a.status,a.create_time,a.update_time
-    </sql>
-
-    <!--  用户表  -->
-    <sql id="TABLE_USER_INFO">
-        <include refid="com.zxqax.nblog.dao.UserDao.BASE_TABLE" />
-    </sql>
-
-    <insert id="addview">
-        insert into tb_view (u_id,a_id,time) values (#{user},#{aid},NOW())
+<mapper namespace="com.nblog.dao.ArticleDao">
+    <insert id="addDraft"  parameterType="com.nblog.entity.Draft">
+        INSERT INTO
+            tb_draft (
+                user_id,
+                title,
+                content,
+                tags,
+                scope,
+                create_time,
+                update_time
+            )
+        VALUES (
+                #{userId},
+                #{title},
+                #{content},
+                #{tags},
+                #{scope},
+                NOW(),
+                NOW()
+            )
     </insert>
-    <insert id="addDraft">
-        insert into tb_draft (user_id,title,content,tags,scope,create_time,update_time)
-        values (#{userId},#{title},#{content},#{tags},#{scope},NOW(),NOW())
-    </insert>
-    <insert id="addArticle" parameterType="com.zxqax.nblog.entity.Article" useGeneratedKeys="true" keyProperty="id">
-        insert into tb_article (user_id,article_title,article_content,article_desc,article_tags,status,create_time,update_time,img)
-            values (#{userId},#{articleTitle},#{articleContent},#{articleDesc},#{articleTags},#{status},NOW(),NOW(),#{img})
-    </insert>
-    <insert id="addDir">
-        insert into tb_dir (user_id,title,time) value (#{user},#{dirName},NOW())
+    <insert id="addArticle" parameterType="com.nblog.entity.Article" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+            tb_article (
+                user_id,
+                article_title,
+                article_content,
+                article_desc,
+                article_tags,
+                status,
+                create_time,
+                update_time,
+                img
+            )
+        VALUES (
+                #{userId},
+                #{articleTitle},
+                #{articleContent},
+                #{articleDesc},
+                #{articleTags},
+                #{status},
+                NOW(),
+                NOW(),
+                #{img}
+            )
     </insert>
     <update id="updateArticlePath">
-        update tb_article set article_content=#{path} where id=#{aid}
-    </update>
-    <update id="updateImg">
-        update tb_article set img=#{img} where id=#{id}
+        UPDATE
+            tb_article
+        SET
+            article_content=#{path}
+        WHERE
+            id=#{aid}
     </update>
     <update id="deleteArticle">
-        update tb_article set is_delete=1 where id=#{aid}
-    </update>
-    <update id="removeArticle">
-        update tb_article set article_dir=#{did} where id=#{aid}
+        UPDATE
+            tb_article
+        SET
+            is_delete=1
+        WHERE
+            id=#{aid}
     </update>
     <update id="reEditorSubmit">
-        update tb_article set article_title=#{articleTitle},article_desc=#{articleDesc}, `status`=#{status},
-        article_tags=#{articleTags},is_delete=0,update_time=NOW(),img=#{img} where id=#{userId}
-    </update>
-    <update id="updateDir">
-        update tb_article set article_dir = 0 where article_dir = #{did}
-    </update>
-    <update id="deleteDir">
-        update tb_dir set state= 0 where id=#{did}
+        UPDATE
+            tb_article
+        SET
+            article_title = #{articleTitle},
+            article_desc = #{articleDesc},
+            `status` = #{status},
+            article_tags = #{articleTags},
+            is_delete = 0,
+            update_time = NOW(),
+            img = #{img}
+        WHERE
+            id=#{userId}
     </update>
     <update id="deleteDraft">
-        update tb_draft set status = 0 where id =#{did}
+        UPDATE
+            tb_draft
+        SET
+            status = 0
+        WHERE
+            id =#{did}
     </update>
-    <!--  获取文章总数  -->
+
     <select id="getTotalArticleCount" resultType="java.lang.Integer">
         SELECT
             count(*)
         FROM
-            <include refid="BASE_TABLE" /> as a
+            tb_article as a
         WHERE
             a.is_delete = 0 and a.status = 1
     </select>
 
-    <!--  通过分页获取文章  -->
-    <select id="getArticlesByPagination" resultType="com.zxqax.nblog.vo.ArticlePageVO">
+    <select id="getArticlesByPagination" resultType="com.nblog.vo.ArticlePageVO">
         SELECT
             a.id id,
             a.user_id,
@@ -81,17 +108,16 @@
             a.update_time,
             img
         FROM
-            <include refid="BASE_TABLE" /> AS a ,
-            <include refid="TABLE_USER_INFO" /> AS u
+            tb_article AS a ,
+            tb_user_info AS u
         WHERE
             a.user_id=u.id and a.is_delete = 0 and a.status = 1
         ORDER BY
             a.is_top desc, a.id desc
         LIMIT
             #{page},#{limit}
-
     </select>
-    <select id="getArticleDetailsByID" resultType="com.zxqax.nblog.dto.ArticleDetailsDTO">
+    <select id="getArticleDetailsByID" resultType="com.nblog.dto.ArticleDetailsDTO">
         SELECT
             a.user_id author_id,
             u.`name` `name`,
@@ -99,127 +125,100 @@
             a.article_content content,
             a.article_tags tags,
             a.create_time,
-            a.update_time,
-            (	SELECT
-                    count(*) FROM tb_view as v
-                WHERE v.a_id = #{id}
-            ) all_view,
-            (	SELECT
-                    count(*) FROM tb_like as l
-                WHERE l.l_id = #{id}
-            ) all_like,
-            (	SELECT
-                    count(*) FROM tb_favorites as f
-                WHERE f.a_id = #{id}
-            ) all_favorites
+            a.update_time
         FROM
-            <include refid="BASE_TABLE" /> AS a ,
-            <include refid="TABLE_USER_INFO" /> AS u
+            tb_article AS a ,
+            tb_user_info AS u
         WHERE
             a.user_id=u.id and a.id = #{id}
         Limit 1
     </select>
-
-    <select id="getAllArticle" resultType="com.zxqax.nblog.dto.ArticleDTO">
+    <select id="getScopeByID" resultType="java.lang.Integer">
         SELECT
-            a.id,
-            u.`name` author,
-            a.article_title title,
-            a.article_content content,
-            a.create_time
-        FROM
-            <include refid="BASE_TABLE" /> AS a ,
-            <include refid="TABLE_USER_INFO" /> AS u
-        WHERE
-            a.user_id=u.id and a.status = 1 and a.is_delete=0
-    </select>
-
-    <select id="getOthers" resultType="com.zxqax.nblog.dto.ArticleAboutUserDTO">
-        SELECT
-        ( SELECT count(*)
-            FROM tb_favorites
-            WHERE u_id=#{user} and a_id=#{aid}
-        ) is_favorites ,
-        (
-            SELECT count(*)
-            FROM tb_follow
-            WHERE u_id=#{user} and f_id=#{author}
-        ) is_attention,
-        (	SELECT count(*)
-            FROM tb_like
-            WHERE u_id=#{user} and l_id=#{aid}
-        ) is_like
-    </select>
-    <select id="getAllFavorites" resultType="com.zxqax.nblog.dto.FavoriteDTO">
-        select
-            id ,article_title title,(select `time` from tb_favorites where a_id = id and u_id = #{uid} limit 1) update_time
+            `status`
         FROM
             tb_article
-        where id in (select a_id from tb_favorites where u_id = #{uid}) and is_delete = 0 and `status`!=3
-        ORDER BY update_time desc
+        WHERE
+            id = #{aid}
     </select>
-    <select id="getNotArchived" resultType="com.zxqax.nblog.dto.ArticleDTO">
-        select id, article_content author , article_title title,article_desc content,update_time createTime
-        from tb_article
-        where user_id = #{user} and is_delete = 0 and article_dir = 0
-        order by update_time desc
-    </select>
-    <select id="getDirs" resultType="com.zxqax.nblog.dto.DirDTO">
+    <select id="getPrintDetails" resultType="com.nblog.dto.PrintDTO">
         SELECT
-            d.id id,
-            (SELECT count(*)
-             from tb_article
-             where article_dir = d.id and user_id = #{user} and is_delete = 0
-            ) count,
-            title  `name`
-        from tb_dir d
-        where state=1 and user_id = #{user}
-    </select>
-    <select id="getDirsDetails" resultType="com.zxqax.nblog.dto.ArticleDTO">
-        select id, article_content author , article_title title,article_desc content,update_time createTime
-        from tb_article
-        where user_id = #{user} and is_delete = 0 and article_dir = #{aid}
-        order by update_time desc
-    </select>
-    <select id="searchByTitle" resultType="com.zxqax.nblog.dto.ArticleDTO">
-        select id, article_content author , article_title title,article_desc content,update_time createTime
-        from tb_article
-        where user_id = #{user} and is_delete = 0 and article_title like concat('%',#{title},'%')
-    </select>
-    <select id="searchByTitleAndDir" resultType="com.zxqax.nblog.dto.ArticleDTO">
-        select id, article_content author , article_title title,article_desc content,update_time createTime
-        from tb_article
-        where user_id = #{user} and is_delete = 0 and article_title like concat('%',#{title},'%') and article_dir = #{did}
-    </select>
-    <select id="getPrintDetails" resultType="com.zxqax.nblog.dto.PrintDTO">
-        select
-            (select `name` from tb_user_info u where u.id = a.user_id) author,
+            (SELECT `name` FROM tb_user_info u WHERE u.id = a.user_id) author,
             article_tags tags,
-            (select title from tb_dir d where d.id = a.article_dir) dir
-        from tb_article a
-        where a.id = #{aid}
+            (SELECT title FROM tb_dir d WHERE d.id = a.article_dir) dir
+        FROM
+            tb_article a
+        WHERE a.id = #{aid}
     </select>
-    <select id="getRePublishArticle" resultType="com.zxqax.nblog.dto.ArticleDetailsDTO">
-        select id, user_id author_id, article_title title, article_content content,article_tags tags,`status` scope from tb_article
-        where id=#{aid}
+    <select id="getRePublishArticle" resultType="com.nblog.dto.ArticleDetailsDTO">
+        SELECT
+            id,
+            user_id author_id,
+            article_title title,
+            article_content content,
+            article_tags tags,
+            `status` scope
+        FROM
+            tb_article
+        where
+            id=#{aid}
     </select>
-    <select id="getRecommendArticle" resultType="com.zxqax.nblog.dto.DirDTO">
-        select a_id id, (select article_title from tb_article where id= a_id and is_delete=0 and status=1) name, count(*) count
-        from tb_view where a_id in (SELECT id from tb_article where is_delete=0 and status=1) GROUP BY a_id ORDER BY count desc limit 5
+    <select id="getRecommendArticle" resultType="com.nblog.dto.DirDTO">
+        SELECT
+            id,
+            article_title name
+        FROM
+            tb_article
+        WHERE
+            id in
+            <foreach collection="aids" index="index" item="item" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
     </select>
-    <select id="getAllDraft" resultType="com.zxqax.nblog.dto.DraftDTO">
-        select id,title,update_time from tb_draft where user_id=#{user} and status = 1 order by update_time desc
+    <select id="getAllDraft" resultType="com.nblog.dto.DraftDTO">
+        SELECT
+            id,
+            title,
+            update_time
+        FROM
+            tb_draft
+        WHERE
+            user_id=#{user} AND status = 1
+        ORDER BY update_time DESC
     </select>
-    <select id="getReDraftInfo" resultType="com.zxqax.nblog.entity.Draft">
-        select * from tb_draft where id=#{aid}
+    <select id="getReDraftInfo" resultType="com.nblog.entity.Draft">
+        SELECT
+            *
+        FROM
+            tb_draft
+        WHERE
+            id=#{aid}
     </select>
     <select id="getEchartsDataByMonth" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM tb_article where user_id = #{user} and (create_time like CONCAT(#{month},'%')) and is_delete = 0
+        SELECT
+            COUNT(*)
+        FROM
+            tb_article
+        WHERE
+            user_id = #{user} AND (create_time LIKE CONCAT(#{month},'%')) AND is_delete = 0
     </select>
     <select id="getEchartsDataByYear" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM tb_article where user_id = #{user} and (create_time like CONCAT(#{year},'%')) and is_delete = 0
+        SELECT
+            COUNT(*)
+        FROM
+            tb_article
+        WHERE
+            user_id = #{user} AND (create_time LIKE CONCAT(#{year},'%')) AND is_delete = 0
     </select>
-    <select id="getScopeByID" resultType="java.lang.Integer">
-        select `status` from tb_article where id = #{aid}
+    <select id="getPublishedByUser" resultType="com.nblog.dto.ArticleDTO">
+        SELECT
+            id,
+            article_title title,
+            update_time create_time
+        FROM
+            tb_article
+        WHERE user_id=#{id} AND is_delete=0 AND status!=2
+        ORDER BY update_time DESC
     </select>
 </mapper>

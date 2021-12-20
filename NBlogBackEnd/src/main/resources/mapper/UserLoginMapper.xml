@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nblog.dao.UserLoginDao">
+
+
+    <select id="getInfoByEmail" resultType="com.nblog.entity.UserInfo">
+        SELECT
+            u.id,
+            u.name,
+            u.pwd,
+            u.email,
+            u.avatar,
+            u.intro,
+            u.is_disable,
+            u.create_time,
+            u.update_time
+        FROM
+            tb_user_info u
+        WHERE
+            u.email = #{email}
+        Limit 1
+    </select>
+    <select id="getInfoByName" resultType="com.nblog.entity.UserInfo">
+        SELECT
+            u.id,
+            u.name,
+            u.pwd,
+            u.email,
+            u.avatar,
+            u.intro,
+            u.is_disable,
+            u.create_time,
+            u.update_time
+        FROM
+            tb_user_info u
+        WHERE
+            u.name = #{name}
+        Limit 1
+    </select>
+</mapper>

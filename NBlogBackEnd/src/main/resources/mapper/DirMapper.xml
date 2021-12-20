@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nblog.dao.DirDao">
+    <insert id="addDir">
+        INSERT INTO
+            tb_dir (
+                user_id,
+                title,
+                `time`
+            )
+        VALUES (
+                #{user},
+                #{dirName},
+                NOW()
+            )
+    </insert>
+    <update id="removeArticle">
+        UPDATE
+            tb_article
+        SET
+            article_dir=#{did}
+        WHERE
+            id=#{aid}
+    </update>
+    <update id="updateDir">
+        UPDATE
+            tb_article
+        SET
+            article_dir = 0
+        WHERE
+            article_dir = #{did}
+    </update>
+    <update id="deleteDir">
+        UPDATE
+            tb_dir
+        SET
+            state= 0
+        WHERE
+            id=#{did}
+    </update>
+
+    <select id="getNotArchived" resultType="com.nblog.dto.ArticleDTO">
+        SELECT
+            id,
+            article_content author ,
+            article_title title,
+            article_desc content,
+            update_time createTime
+        FROM
+            tb_article
+        WHERE user_id = #{user} AND is_delete = 0 AND article_dir = 0
+        ORDER BY update_time DESC
+    </select>
+    <select id="getDirs" resultType="com.nblog.dto.DirDTO">
+        SELECT
+            d.id id,
+            (SELECT count(*)
+             FROM tb_article
+             WHERE article_dir = d.id AND user_id = #{user} AND is_delete = 0
+            ) `count`,
+            title  `name`
+        FROM
+            tb_dir d
+        WHERE
+            state=1 AND user_id = #{user}
+    </select>
+    <select id="getDirsDetails" resultType="com.nblog.dto.ArticleDTO">
+        SELECT
+            id,
+            article_content author ,
+            article_title title,
+            article_desc content,
+            update_time createTime
+        FROM
+            tb_article
+        WHERE
+            user_id = #{user} AND is_delete = 0 AND article_dir = #{aid}
+        ORDER BY update_time DESC
+    </select>
+    <select id="searchByTitle" resultType="com.nblog.dto.ArticleDTO">
+        SELECT
+            id,
+            article_content author ,
+            article_title title,
+            article_desc content,
+            update_time createTime
+        FROM
+            tb_article
+        WHERE
+            user_id = #{user} AND is_delete = 0 AND article_title LIKE concat('%',#{title},'%')
+    </select>
+    <select id="searchByTitleAndDir" resultType="com.nblog.dto.ArticleDTO">
+        SELECT
+            id,
+            article_content author ,
+            article_title title,
+            article_desc content,
+            update_time createTime
+        FROM
+            tb_article
+        WHERE
+            user_id = #{user} AND is_delete = 0 AND article_title LIKE concat('%',#{title},'%') AND article_dir = #{did}
+    </select>
+</mapper>

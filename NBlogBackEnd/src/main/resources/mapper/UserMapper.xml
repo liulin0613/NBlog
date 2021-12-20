@@ -1,149 +1,81 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zxqax.nblog.dao.UserDao">
-
-    <!-- 表名   -->
-    <sql id="BASE_TABLE">
-        tb_user_info
-    </sql>
-
-    <!-- 基本列   -->
-    <sql id="BASE_COLUMN">
-        u.id,u.name,u.pwd,u.email,u.avatar,u.intro,u.is_disable,u.create_time,u.update_time
-    </sql>
-
-    <!-- 关注表   -->
-    <sql id="ATTENTION_TABLE">
-        tb_follow
-    </sql>
-
-    <!-- 收藏表   -->
-    <sql id="Favorite_TABLE">
-        tb_favorites
-    </sql>
-
-    <insert id="addFollow">
+<mapper namespace="com.nblog.dao.UserDao">
+    <insert id="addCollect">
         INSERT INTO
-            <include refid="ATTENTION_TABLE" />
-            (u_id,f_id,`time`)
-        VALUES
-            (#{uid},#{fid},NOW())
-    </insert>
-
-    <insert id="addFavorites">
-        INSERT INTO
-            <include refid="Favorite_TABLE" />
-            (u_id,a_id,`time`)
-        VALUES
-            (#{uid},#{aid},NOW())
-    </insert>
-    <insert id="addLike">
-        insert into tb_like (u_id,l_id,time) values (#{uid} , #{aid} ,NOW())
+            tb_collects (
+                u_id,
+                a_id,
+                `time`
+            )
+        VALUES (
+                #{uid},
+                #{aid},
+                NOW()
+            )
     </insert>
     <update id="updateImg">
-        update tb_user_info set avatar=#{img} , update_time = NOW() where id=#{id}
+         update tb_user_info set avatar=#{img} , update_time = NOW() where id=#{id}
     </update>
-    <update id="updateUserName">
-        update tb_user_info set name = #{name} where id =#{user}
-    </update>
-    <update id="updateUserIntro">
-        update tb_user_info set intro = #{intro} where id =#{user}
-    </update>
-    <update id="updateUserPwd">
-        update tb_user_info set pwd = #{pwd} where id =#{user}
-    </update>
-
-    <delete id="deleteFollow">
-        DELETE FROM
-            <include refid="ATTENTION_TABLE" />
-        WHERE
-            u_id=#{uid} and f_id=#{fid}
-    </delete>
-    <delete id="deleteFavorites">
-        DELETE FROM
-            <include refid="Favorite_TABLE"/>
-        WHERE
-            u_id=#{uid} and a_id=#{aid}
-    </delete>
-    <delete id="deleteLike">
-        delete from tb_like where u_id=#{uid} and l_id=#{aid}
-    </delete>
-
-    <select id="checkIfTheUserNameExists" resultType="java.lang.Integer">
-        SELECT
-            count(*)
-        FROM
-           <include refid="BASE_TABLE" /> as u
-        WHERE
-            u.name=#{name} and u.is_disable = 0
-    </select>
 
     <select id="checkIfTheEmailExists" resultType="java.lang.Integer">
         SELECT
             count(*)
         FROM
-            <include refid="BASE_TABLE" /> as u
+            tb_user_info as u
         WHERE
             u.email=#{email} and u.is_disable = 0
     </select>
-
-    <select id="getInfo" resultType="com.zxqax.nblog.entity.UserInfo">
-        SELECT
-            <include refid="BASE_COLUMN" />
-        FROM
-            <include refid="BASE_TABLE" /> as u
-        WHERE
-            u.name = #{name}
-        Limit 1
-    </select>
-
-    <select id="getIs_Favorites" resultType="java.lang.Integer">
+    <select id="checkIfTheUserNameExists" resultType="java.lang.Integer">
         SELECT
             count(*)
         FROM
-            <include refid="Favorite_TABLE" />
+             tb_user_info as u
         WHERE
-            u_id=#{uid} and a_id=#{aid}
-    </select>
-
-    <select id="getIs_Attention" resultType="java.lang.Integer">
-        SELECT
-            count(*)
-        FROM
-            <include refid="ATTENTION_TABLE" /> as att ,
-            <include refid="com.zxqax.nblog.dao.ArticleDao.BASE_TABLE"/> as a
-        WHERE
-            att.f_id=a.user_id and att.u_id=#{uid} and a.id = #{fid}
-    </select>
-    <select id="ArticleInfo" resultType="com.zxqax.nblog.vo.ArticleInfoVO">
-        SELECT
-            (select count(*) from tb_article where user_id = #{user} and is_delete=0 ) count,
-            a_id aid,
-            (select article_title  from tb_article where id=a_id) title,
-            count(*) total
-            from tb_view where a_id in (select id from tb_article where user_id = #{user} and is_delete=0)
-            GROUP BY a_id
-            ORDER BY total desc limit 1
-    </select>
-    <select id="getAtts" resultType="com.zxqax.nblog.dto.UserDTO">
-        select name u_name,avatar,id from tb_user_info where id in (select f_id from tb_follow where u_id =#{user} and f_id != u_id)
-    </select>
-    <select id="getFans" resultType="com.zxqax.nblog.dto.UserDTO">
-        select name u_name,avatar ,id from tb_user_info where id in (select u_id from tb_follow where f_id =#{user} and f_id != u_id)
-    </select>
-    <select id="getAllFollow" resultType="com.zxqax.nblog.dto.AttDTO">
-        SELECT u.id, u.name,u.create_time `time`, avatar,intro,
-            (SELECT count(*) from tb_follow where u.id = f_id and u_id in (select id from tb_user_info)) fans_count,
-            (SELECT count(*) from tb_follow where u.id = u_id and f_id in (select id from tb_user_info)) att_count,
-            (SELECT count(*) from tb_article WHERE user_id = u.id and is_delete = 0 and status != 2) article_count
-            from tb_user_info u where u.id  in
-						( select DISTINCT f.f_id from tb_follow f where f.u_id = #{user} and f.f_id in  (select id from tb_user_info))
-    </select>
-    <select id="getPublishedByID" resultType="com.zxqax.nblog.dto.ArticleDTO">
-        select id,article_title title,update_time create_time
-        from tb_article  where user_id=#{id} and is_delete=0 and status!=2 ORDER BY update_time desc
+            u.name=#{name} and u.is_disable = 0
     </select>
     <select id="getNameByID" resultType="java.lang.String">
-        select name from tb_user_info where id=#{userId}
+        SELECT
+            `name`
+        FROM
+            tb_user_info
+        WHERE
+            id=#{userId}
+    </select>
+    <select id="getAllCollects" parameterType="java.util.List" resultType="com.nblog.dto.FavoriteDTO">
+        SELECT
+            id,
+            article_title title,
+            update_time
+        FROM
+            tb_article
+        WHERE
+            id in
+            <foreach collection="ids" index="index" item="item" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
+    </select>
+    <select id="getAllAttention" resultType="com.nblog.dto.AttDTO">
+        SELECT
+            u.id,
+            u.name,
+            u.create_time `time`,
+            avatar,
+            intro,
+            (   SELECT
+                    count(*)
+                FROM
+                    tb_article
+                WHERE
+                    user_id = u.id AND is_delete = 0 AND status != 2) article_count
+        FROM
+            tb_user_info u
+        WHERE
+            u.id in
+            <foreach collection="ids" index="index" item="item" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
     </select>
 </mapper>

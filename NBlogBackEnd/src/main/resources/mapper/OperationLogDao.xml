@@ -1,13 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.zxqax.nblog.dao.OperationLogDao">
-
+<mapper namespace="com.nblog.dao.OperationLogDao">
     <insert id="insert">
-        insert into tb_operation_log
-        (opt_module,opt_type,opt_url,opt_method,opt_desc,request_param,request_method,
-        response_data,user_id,nickname,ip_address,ip_source,create_time,update_time)
-        values (#{optModule},#{optType},#{optUrl},#{optMethod},#{optDesc},#{requestParam},
-        #{requestMethod},#{responseData},#{userId},#{name},#{ipAddress},#{ipSource},
-        NOW(),NOW())
+        INSERT INTO
+            tb_operation_log (
+                opt_module,
+                opt_type,
+                opt_url,
+                opt_method,
+                opt_desc,
+                request_param,
+                request_method,
+                response_data,
+                user_id,
+                nickname,
+                ip_address,
+                ip_source,
+                create_time,
+                update_time
+            )
+        VALUES (
+                #{optModule},
+                #{optType},
+                #{optUrl},
+                #{optMethod},
+                #{optDesc},
+                #{requestParam},
+                #{requestMethod},
+                #{responseData},
+                #{userId},
+                #{name},
+                #{ipAddress},
+                #{ipSource},
+                NOW(),
+                NOW()
+            )
     </insert>
 </mapper>

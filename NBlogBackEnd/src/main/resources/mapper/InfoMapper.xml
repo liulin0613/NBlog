@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.nblog.dao.InfoDao">
+
+    <update id="updateUserName">
+        UPDATE
+            tb_user_info
+        SET
+            `name` = #{name}
+        WHERE
+            id =#{user}
+    </update>
+    <update id="updateUserIntro">
+        UPDATE
+            tb_user_info
+        SET
+            intro = #{intro}
+        WHERE
+            id =#{user}
+    </update>
+    <update id="updateUserPwd">
+        UPDATE
+            tb_user_info
+        SET
+            pwd = #{pwd}
+        WHERE
+            id =#{user}
+    </update>
+    <select id="getSocialInfo" resultType="com.nblog.dto.UserDTO">
+        SELECT
+            `name` u_name,
+            avatar,
+            id
+        FROM
+            tb_user_info
+        WHERE
+            id in
+            <foreach collection="ids" index="index" item="item" open="("
+                     separator="," close=")">
+                #{item}
+            </foreach>
+    </select>
+</mapper>
