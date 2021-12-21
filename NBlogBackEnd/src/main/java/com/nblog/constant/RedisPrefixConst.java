@@ -70,4 +70,19 @@ public final class RedisPrefixConst {
      * 用户粉丝前缀 set
      */
     public static final String USER_FANS = "u_f_";
+
+    /**
+     * 文章消息
+     */
+    public static final String ARTICLE_MESSAGE = "article_message";
+
+    /**
+     *  已消费的文章消息
+     */
+    public static final String CONSUMER_ARTICLE_MESSAGE = "consumer_article_message";
+
+    /**
+     * 邮件消息
+     */
+    public static final String EMAIL_MESSAGE = "email_message";
 }

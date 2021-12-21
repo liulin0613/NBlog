@@ -25,6 +25,15 @@ spring:
     virtual-host: vhost
     host: host
     port: 5672
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+      direct:
+        acknowledge-mode: manual
+    message:
+      retry: true
 
   # ElasticSearch œ‡πÿ≈‰÷√
   elasticsearch:

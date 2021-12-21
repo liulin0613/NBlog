@@ -16,6 +16,11 @@ public final class MQPrefixConst {
     public static final String ES_QUEUE = "es_queue";
 
     /**
+     * es routingKey
+     */
+    public static final String ES_ROUTING_KEY = "tea";
+
+    /**
      * email交换机
      */
     public static final String EMAIL_EXCHANGE = "email_exchange";
@@ -24,4 +29,9 @@ public final class MQPrefixConst {
      * email 队列
      */
     public static final String EMAIL_QUEUE = "email_queue";
+
+    /**
+     * email routingKey
+     */
+    public static final String EMAIL_ROUTING_KEY = "coffee";
 }

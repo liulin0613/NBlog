@@ -1,10 +1,10 @@
 package com.nblog.service.Impl;
 
-import com.alibaba.fastjson.JSON;
 import com.nblog.dao.ArticleDao;
 import com.nblog.dto.*;
 import com.nblog.entity.Article;
 import com.nblog.entity.Draft;
+import com.nblog.producer.ArticleProducer;
 import com.nblog.service.ArticleService;
 import com.nblog.service.RedisService;
 import com.nblog.service.UserService;
@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.nblog.constant.CommonConst.MDS_PATH;
-import static com.nblog.constant.MQPrefixConst.ES_EXCHANGE;
 import static com.nblog.constant.RedisPrefixConst.*;
 
 @Service
@@ -35,13 +34,16 @@ public class ArticleServiceImpl implements ArticleService {
     private UserService userService;
     private RedisService redisService;
     private RabbitTemplate rabbitTemplate;
+    private ArticleProducer articleProducer;
 
     @Autowired
-    public ArticleServiceImpl(ArticleDao articleDao, UserService userService, RedisService redisService, RabbitTemplate rabbitTemplate) {
+    public ArticleServiceImpl(ArticleDao articleDao, UserService userService, RedisService redisService,
+                              RabbitTemplate rabbitTemplate, ArticleProducer articleProducer) {
         this.articleDao = articleDao;
         this.userService = userService;
         this.redisService = redisService;
         this.rabbitTemplate = rabbitTemplate;
+        this.articleProducer=articleProducer;
     }
 
     @Override
@@ -139,7 +141,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         // rabbitMQ 消息队列操作 ES 和 磁盘
         article.setArticleContent(articleVO.getContent());
-        rabbitTemplate.convertAndSend(ES_EXCHANGE,"", JSON.toJSONString(article));
+        articleProducer.sendMessage(article);
 
         return Result.ok(true);
     }
@@ -157,7 +159,7 @@ public class ArticleServiceImpl implements ArticleService {
             Article article = new Article();
             article.setUserId(-1); // -1 表示删除消息标志位
             article.setId(aid);
-            rabbitTemplate.convertAndSend(ES_EXCHANGE,"",JSON.toJSONString(article));
+            articleProducer.sendMessage(article);
         }
 
         return Result.ok(true);

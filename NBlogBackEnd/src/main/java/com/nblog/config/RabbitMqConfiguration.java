@@ -1,9 +1,6 @@
 package com.nblog.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,8 +28,8 @@ public class RabbitMqConfiguration {
      * @return
      */
     @Bean
-    public FanoutExchange ESExchange() {
-        return new FanoutExchange(ES_EXCHANGE, true, false);
+    public DirectExchange ESExchange() {
+        return new DirectExchange(ES_EXCHANGE, true, false);
     }
 
     /**
@@ -41,7 +38,7 @@ public class RabbitMqConfiguration {
      */
     @Bean
     public Binding bindingESDirect() {
-        return BindingBuilder.bind(ESQueue()).to(ESExchange());
+        return BindingBuilder.bind(ESQueue()).to(ESExchange()).with(ES_ROUTING_KEY);
     }
 
     /**
@@ -58,8 +55,8 @@ public class RabbitMqConfiguration {
      * @return
      */
     @Bean
-    public FanoutExchange emailExchange() {
-        return new FanoutExchange(EMAIL_EXCHANGE, true, false);
+    public DirectExchange emailExchange() {
+        return new DirectExchange(EMAIL_EXCHANGE, true, false);
     }
 
     /**
@@ -68,6 +65,6 @@ public class RabbitMqConfiguration {
      */
     @Bean
     public Binding bindingEmailDirect() {
-        return BindingBuilder.bind(emailQueue()).to(emailExchange());
+        return BindingBuilder.bind(emailQueue()).to(emailExchange()).with(EMAIL_ROUTING_KEY);
     }
 }
